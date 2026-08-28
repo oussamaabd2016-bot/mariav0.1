@@ -1,0 +1,12 @@
+{% comment %}
+Reusable price display component.
+Usage: {% include "products/includes/price_display.html" with product=product %}
+{% endcomment %}
+{% if product.has_discount %}
+    <p class="mb-0">
+        <span class="fw-bold text-dark">{{ product.discount_price }} MAD</span>
+        <span class="text-muted text-decoration-line-through ms-2">{{ product.price }} MAD</span>
+    </p>
+{% else %}
+    <p class="mb-0 fw-bold text-dark">{{ product.price }} MAD</p>
+{% endif %}

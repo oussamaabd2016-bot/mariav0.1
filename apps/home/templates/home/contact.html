@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Contact us — Maira Bijouterie{% endblock %}
+
+{% block meta_description %}Get in touch with Maira Bijouterie — WhatsApp support, email and our Casablanca atelier.{% endblock %}
+
+{% block main_classes %}container my-5{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-5">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Contact</li>
+    </ol>
+</nav>
+
+<div class="row g-5 align-items-start">
+    {# Left — Contact info #}
+    <div class="col-lg-5">
+        <p class="text-overline mb-2">Get in touch</p>
+        <h1 class="section-title mb-3" style="font-size: 2.4rem; line-height: 1.15;">We'd love to<br>hear from you.</h1>
+        <p class="brand-story-text mb-5">Questions about an order, sizing, or a custom piece? Reach us any day of the week — in French or Arabic.</p>
+
+        <div class="d-flex flex-column gap-3">
+
+            {# WhatsApp #}
+            <a href="https://wa.me/{{ whatsapp_number }}" rel="noopener" target="_blank" class="text-decoration-none">
+                <div class="d-flex align-items-center gap-3 p-3" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 1rem; border: 1px solid rgba(212,175,55,0.15); transition: border-color 0.2s ease;">
+                    <div class="flex-shrink-0 d-flex align-items-center justify-content-center"
+                         style="width: 44px; height: 44px; border-radius: 0.75rem; background: rgba(37, 211, 102, 0.1);">
+                        <svg width="20" height="20" fill="#25D366" viewBox="0 0 16 16">
+                            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.1em; color: var(--maira-accent);">WhatsApp</div>
+                        <div class="text-dark fw-semibold" style="font-size: 0.9rem;">{{ whatsapp_number }}</div>
+                    </div>
+                </div>
+            </a>
+
+            {# Email #}
+            <a href="mailto:hello@maira.ma" class="text-decoration-none">
+                <div class="d-flex align-items-center gap-3 p-3" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 1rem; border: 1px solid rgba(212,175,55,0.15); transition: border-color 0.2s ease;">
+                    <div class="flex-shrink-0 d-flex align-items-center justify-content-center"
+                         style="width: 44px; height: 44px; border-radius: 0.75rem; background: rgba(212,175,55,0.1);">
+                        <svg width="18" height="18" fill="none" stroke="var(--maira-gold)" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="m22 4-10 9L2 4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.1em; color: var(--maira-accent);">Email</div>
+                        <div class="text-dark fw-semibold" style="font-size: 0.9rem;">hello@maira.ma</div>
+                    </div>
+                </div>
+            </a>
+
+            {# Atelier #}
+            <div class="d-flex align-items-center gap-3 p-3" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 1rem; border: 1px solid rgba(212,175,55,0.15);">
+                <div class="flex-shrink-0 d-flex align-items-center justify-content-center"
+                     style="width: 44px; height: 44px; border-radius: 0.75rem; background: rgba(212,175,55,0.1);">
+                    <svg width="18" height="18" fill="none" stroke="var(--maira-gold)" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.1em; color: var(--maira-accent);">Atelier</div>
+                    <div class="text-dark fw-semibold" style="font-size: 0.9rem;">Casablanca, Morocco</div>
+                    <div class="text-muted" style="font-size: 0.78rem;">Mon–Sat · 9:00–19:00 (GMT+1)</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# Right — Map #}
+    <div class="col-lg-7">
+        <div class="ratio ratio-4x3" style="border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.08);">
+            <iframe src="https://www.google.com/maps?q=Casablanca,%20Morocco&output=embed"
+                    title="Maira Bijouterie — Casablanca" loading="lazy" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,321 @@
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<head>
+  <title>{% block title %}{% endblock %} | Maira Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+
+  {# Django admin base styles + dark mode #}
+  <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
+  <script src="{% static 'admin/js/theme.js' %}" defer></script>
+  {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static 'admin/css/rtl.css' %}">{% endif %}
+  <link rel="stylesheet" href="{% static 'admin/css/responsive.css' %}">
+
+  {# Our custom admin layout on top #}
+  <style>
+    /* ============================================================
+       Maira Admin — full custom sidebar layout
+       We intentionally do NOT include nav_sidebar.css so Django's
+       toggle-button and position:fixed sidebar don't interfere.
+    ============================================================ */
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Remove Django's default top-bar header positioning */
+    #container {
+      display: flex;
+      flex-direction: row;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── LEFT SIDEBAR ─────────────────────────────────────────── */
+    #maira-sidebar {
+      width: 260px;
+      min-width: 260px;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--sidebar-bg, #1a1a2e);
+      color: #fff;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Brand / logo area */
+    #maira-brand {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-decoration: none;
+      display: block;
+    }
+    #maira-brand h1 {
+      margin: 0 0 2px 0;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+    }
+    #maira-brand span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* User info strip */
+    #maira-user {
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    #maira-user strong {
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+    }
+    #maira-user a {
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-size: 11px;
+    }
+    #maira-user a:hover { color: #fff; }
+    #maira-user .maira-user-links {
+      display: flex; gap: 10px; align-items: center; margin-top: 4px;
+    }
+    #logout-form { display: inline; }
+    #logout-form button {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.45); font-size: 11px; padding: 0;
+    }
+    #logout-form button:hover { color: #fff; }
+
+    /* App list inside sidebar */
+    #maira-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0 20px;
+    }
+    #maira-nav::-webkit-scrollbar { width: 4px; }
+    #maira-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    .maira-nav-app { margin-bottom: 6px; }
+    .maira-nav-app-title {
+      display: block;
+      padding: 8px 20px 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.35);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .maira-nav-app-title:hover { color: rgba(255,255,255,0.7); }
+    .maira-nav-model {
+      display: block;
+      padding: 7px 20px 7px 28px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
+      border-radius: 0;
+    }
+    .maira-nav-model:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .maira-nav-model.active {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font-weight: 600;
+      border-left: 3px solid var(--primary, #79aec8);
+      padding-left: 25px;
+    }
+
+    /* ── MAIN CONTENT AREA ────────────────────────────────────── */
+    #maira-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top bar (replaces the old #header) */
+    #maira-topbar {
+      background: var(--body-bg);
+      border-bottom: 1px solid var(--hairline-color);
+      padding: 12px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .maira-breadcrumbs {
+      font-size: 13px;
+      color: var(--body-quiet-color);
+    }
+    .maira-breadcrumbs a { color: var(--link-fg); text-decoration: none; }
+    .maira-breadcrumbs a:hover { text-decoration: underline; }
+    .maira-theme-toggle {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Scrollable content */
+    #maira-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    /* ── HIDE Django's default header and nav-toggle ──────────── */
+    /* We render our own header so these must be hidden */
+    #header { display: none !important; }
+    .toggle-nav-sidebar { display: none !important; }
+    #nav-sidebar { display: none !important; }
+
+    /* Fix Django's .main flex behaviour (it normally sits next to the sidebar toggle) */
+    .main {
+      display: block !important;
+      width: 100% !important;
+    }
+
+    /* Messages */
+    .messagelist { margin: 0 0 20px; padding: 0; list-style: none; }
+    .messagelist li { padding: 10px 15px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+  </style>
+
+  {% block extrastyle %}{% endblock %}
+  {% block extrahead %}{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+      data-admin-utc-offset="{% now "Z" %}">
+
+{% if not is_popup %}
+<div id="container">
+
+  {# ── LEFT SIDEBAR ─────────────────────────────────────────── #}
+  <aside id="maira-sidebar">
+
+    {# Brand #}
+    <a href="{% url 'admin:index' %}" id="maira-brand">
+      <h1>Maira Bijouterie</h1>
+      <span>Admin Panel</span>
+    </a>
+
+    {# User info #}
+    {% if has_permission %}
+    <div id="maira-user">
+      <strong>{% firstof user.get_short_name user.get_username %}</strong>
+      <div class="maira-user-links">
+        {% if site_url %}
+          <a href="{{ site_url }}">View site</a>
+        {% endif %}
+        {% if user.has_usable_password %}
+          <a href="{% url 'admin:password_change' %}">Password</a>
+        {% endif %}
+        <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+          {% csrf_token %}
+          <button type="submit">Log out</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    {# App / Model Navigation #}
+    <nav id="maira-nav" aria-label="Sidebar navigation">
+      {% include "admin/maira_nav_apps.html" %}
+    </nav>
+
+  </aside>
+
+  {# ── MAIN AREA ─────────────────────────────────────────────── #}
+  <div id="maira-main">
+
+    {# Top bar: breadcrumb + theme toggle #}
+    <div id="maira-topbar">
+      <div class="maira-breadcrumbs">
+        {% block breadcrumbs %}
+          <a href="{% url 'admin:index' %}">Home</a>
+          {% if title %} &rsaquo; {{ title }}{% endif %}
+        {% endblock %}
+      </div>
+      <div class="maira-theme-toggle">
+        {% include "admin/color_theme_toggle.html" %}
+      </div>
+    </div>
+
+    {# Scrollable content #}
+    <div id="maira-content">
+      {# Messages #}
+      {% block messages %}
+        {% if messages %}
+          <ul class="messagelist">
+            {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endblock %}
+
+      {# Django injects its content here #}
+      <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+        {% block content %}
+          {% block object-tools %}{% endblock %}
+          {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+        <br class="clear">
+      </div>
+      {% block footer %}<div id="footer"></div>{% endblock %}
+    </div>
+
+  </div>
+
+</div>
+
+{% else %}
+{# Popup mode — keep default simple layout #}
+<div id="container">
+  <div id="maira-content" style="padding:20px;">
+    {{ content }}
+  </div>
+</div>
+{% endif %}
+
+{# Django admin SVG icons (needed for theme toggle etc.) #}
+<svg xmlns="http://www.w3.org/2000/svg" class="base-svgs">
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-auto">
+    <path d="M0 0h24v24H0z" fill="currentColor"/>
+    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2V4a8 8 0 1 0 0 16z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-moon">
+    <path d="M0 0h24v24H0z" fill="currentColor"/>
+    <path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/>
+  </symbol>
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-sun">
+    <path d="M0 0h24v24H0z" fill="currentColor"/>
+    <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
+  </symbol>
+</svg>
+
+</body>
+</html>

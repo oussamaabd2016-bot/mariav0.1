@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if query %}Search: {{ query }} — {% elif selected_category %}{{ selected_category.name }} — {% elif active_filters.category %}{{ active_filters.category|title }} — {% endif %}Maira Bijouterie
+{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="text-decoration-none text-dark">Shop</a></li>
+        {% if selected_category %}
+            <li class="breadcrumb-item active" aria-current="page">{{ selected_category.name }}</li>
+        {% elif active_filters.category %}
+            <li class="breadcrumb-item active" aria-current="page">{{ active_filters.category|title }}</li>
+        {% elif query %}
+            <li class="breadcrumb-item active" aria-current="page">Search: "{{ query }}"</li>
+        {% endif %}
+    </ol>
+</nav>
+
+{# Centered Shop Title Section #}
+<div class="shop-hero-header text-center my-4 py-2">
+    <h1 class="shop-main-title text-uppercase mb-2">
+        {% if query %}
+            Results for &ldquo;{{ query }}&rdquo;
+        {% elif selected_category %}
+            {{ selected_category.name }}
+        {% elif active_filters.category %}
+            {{ active_filters.category|title }}
+        {% else %}
+            All Jewellery
+        {% endif %}
+    </h1>
+    <div class="shop-title-gold-divider mx-auto mb-2"></div>
+    <p class="text-muted small text-uppercase letter-spacing-2 mb-0">
+        {{ products.paginator.count }} item{{ products.paginator.count|pluralize }}
+    </p>
+</div>
+
+{# Shop Control Bar: Filter Toggle + Sort Dropdown #}
+<div class="shop-toolbar d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2">
+    <div class="d-flex align-items-center gap-3 mb-2 mb-sm-0">
+        <button type="button" id="toggleFiltersBtn" class="btn btn-luxury-toggle d-inline-flex align-items-center gap-2" aria-expanded="false" aria-controls="shopFiltersSidebar">
+            <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+            <span class="toggle-label fw-semibold">Show Filters</span>
+            {% if active_filters.category or active_filters.material or active_filters.color or active_filters.size or active_filters.min_price or active_filters.max_price or active_filters.waterproof or active_filters.stainless_steel or active_filters.gold_plated or active_filters.in_stock %}
+                <span class="badge bg-gold-subtle text-dark rounded-pill px-2 py-1 small" id="filterCountBadge">• Active</span>
+            {% endif %}
+        </button>
+    </div>
+
+    <form method="get" action="{% url 'products:list' %}" class="d-flex align-items-center gap-2" id="sort-form">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        {% if active_filters.category %}<input type="hidden" name="category" value="{{ active_filters.category }}">{% endif %}
+        {% if active_filters.material %}<input type="hidden" name="material" value="{{ active_filters.material }}">{% endif %}
+        {% if active_filters.color %}<input type="hidden" name="color" value="{{ active_filters.color }}">{% endif %}
+        {% if active_filters.size %}<input type="hidden" name="size" value="{{ active_filters.size }}">{% endif %}
+        {% if active_filters.min_price %}<input type="hidden" name="min_price" value="{{ active_filters.min_price }}">{% endif %}
+        {% if active_filters.max_price %}<input type="hidden" name="max_price" value="{{ active_filters.max_price }}">{% endif %}
+        {% if active_filters.waterproof %}<input type="hidden" name="waterproof" value="{{ active_filters.waterproof }}">{% endif %}
+        {% if active_filters.stainless_steel %}<input type="hidden" name="stainless_steel" value="{{ active_filters.stainless_steel }}">{% endif %}
+        {% if active_filters.gold_plated %}<input type="hidden" name="gold_plated" value="{{ active_filters.gold_plated }}">{% endif %}
+        {% if active_filters.in_stock %}<input type="hidden" name="in_stock" value="{{ active_filters.in_stock }}">{% endif %}
+        
+        <label for="sort" class="small text-muted text-uppercase mb-0 letter-spacing-1">Sort</label>
+        <div class="luxury-select-wrapper">
+            <select name="sort" id="sort" class="form-select form-select-sm luxury-sort-select" onchange="this.form.submit()">
+                <option value="">Featured</option>
+                <option value="newest" {% if active_filters.sort == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="price_asc" {% if active_filters.sort == 'price_asc' %}selected{% endif %}>Price: low to high</option>
+                <option value="price_desc" {% if active_filters.sort == 'price_desc' %}selected{% endif %}>Price: high to low</option>
+                <option value="name" {% if active_filters.sort == 'name' %}selected{% endif %}>Name A-Z</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+{# Main Interactive Catalog Layout with Fine Divider #}
+<div class="shop-catalog-layout is-filters-collapsed" id="shopCatalogLayout">
+    
+    {# Vertical Minimized Tab Button (shown when collapsed) #}
+    <button type="button" class="filters-vertical-tab" id="filtersVerticalTab" aria-label="Open Filters">
+        <span class="vertical-tab-text">FILTERS</span>
+        <span class="vertical-tab-icon">✦</span>
+    </button>
+
+    {# Left Filters Sidebar Container #}
+    <aside class="shop-filters-sidebar" id="shopFiltersSidebar">
+        <div class="filters-card">
+            <div class="filters-card-header d-flex justify-content-between align-items-center mb-3 pb-2">
+                <h2 class="filters-title text-uppercase mb-0">Filters</h2>
+                <button type="button" class="btn-close btn-close-sm" id="closeFiltersBtn" aria-label="Close Filters"></button>
+            </div>
+            
+            <form method="get" action="{% url 'products:list' %}" id="filter-form">
+                {% if active_filters.sort %}<input type="hidden" name="sort" value="{{ active_filters.sort }}">{% endif %}
+
+                <div class="filter-group mb-3">
+                    <label for="q" class="filter-label">Search</label>
+                    <input type="text" id="q" name="q" class="form-control form-control-sm luxury-input" value="{{ query|default:'' }}" placeholder="Search products...">
+                </div>
+
+                <div class="filter-group mb-3">
+                    <label class="filter-label">Category</label>
+                    <select name="category" class="form-select form-select-sm luxury-input">
+                        <option value="">All</option>
+                        {% for category in categories %}
+                            <option value="{{ category.slug }}" {% if active_filters.category == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group mb-3">
+                    <label class="filter-label">Material</label>
+                    <select name="material" class="form-select form-select-sm luxury-input">
+                        <option value="">All</option>
+                        {% for material in materials %}
+                            <option value="{{ material.slug }}" {% if active_filters.material == material.slug %}selected{% endif %}>{{ material.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group mb-3">
+                    <label class="filter-label">Colour</label>
+                    <select name="color" class="form-select form-select-sm luxury-input">
+                        <option value="">All</option>
+                        {% for color in colors %}
+                            <option value="{{ color.slug }}" {% if active_filters.color == color.slug %}selected{% endif %}>{{ color.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group mb-3">
+                    <label class="filter-label">Size</label>
+                    <select name="size" class="form-select form-select-sm luxury-input">
+                        <option value="">All</option>
+                        {% for size in sizes %}
+                            <option value="{{ size.slug }}" {% if active_filters.size == size.slug %}selected{% endif %}>{{ size.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group mb-3">
+                    <label class="filter-label">Price (MAD)</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" name="min_price" class="form-control form-control-sm luxury-input" placeholder="Min" min="0" value="{{ active_filters.min_price }}">
+                        <span class="text-muted small">—</span>
+                        <input type="number" name="max_price" class="form-control form-control-sm luxury-input" placeholder="Max" min="0" value="{{ active_filters.max_price }}">
+                    </div>
+                </div>
+
+                <div class="filter-group mb-4">
+                    <label class="filter-label mb-2">Attributes</label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check luxury-check">
+                            <input class="form-check-input" type="checkbox" name="waterproof" value="1" id="f-waterproof" {% if active_filters.waterproof %}checked{% endif %}>
+                            <label class="form-check-label small" for="f-waterproof">Waterproof</label>
+                        </div>
+                        <div class="form-check luxury-check">
+                            <input class="form-check-input" type="checkbox" name="stainless_steel" value="1" id="f-steel" {% if active_filters.stainless_steel %}checked{% endif %}>
+                            <label class="form-check-label small" for="f-steel">Stainless steel</label>
+                        </div>
+                        <div class="form-check luxury-check">
+                            <input class="form-check-input" type="checkbox" name="gold_plated" value="1" id="f-gold" {% if active_filters.gold_plated %}checked{% endif %}>
+                            <label class="form-check-label small" for="f-gold">Gold plated</label>
+                        </div>
+                        <div class="form-check luxury-check">
+                            <input class="form-check-input" type="checkbox" name="in_stock" value="1" id="f-stock" {% if active_filters.in_stock %}checked{% endif %}>
+                            <label class="form-check-label small" for="f-stock">In stock</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <button type="submit" class="btn btn-luxury-apply w-100">Apply filters</button>
+                    <a href="{% url 'products:list' %}" class="btn btn-luxury-clear w-100 text-center">Clear all</a>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    {# Fine Luxury Divider Line #}
+    <div class="shop-vertical-divider" aria-hidden="true"></div>
+
+    {# Right Products Grid Main Container #}
+    <section class="shop-products-main" id="shopProductsMain">
+        {% if products %}
+            <div class="product-catalog-grid" id="productCatalogGrid">
+                {% for product in products %}
+                    <div class="product-grid-item">
+                        {% include "products/includes/product_card.html" with product=product %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if products.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center luxury-pagination">
+                        {% if products.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?{{ qs }}{% if qs %}&{% endif %}page={{ products.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item disabled"><span class="page-link">Page {{ products.number }} of {{ products.paginator.num_pages }}</span></li>
+                        {% if products.has_next %}
+                            <li class="page-item"><a class="page-link" href="?{{ qs }}{% if qs %}&{% endif %}page={{ products.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5 empty-catalog-box">
+                <p class="h5 mb-2">No products match your search.</p>
+                <p class="text-muted small mb-4">Try clearing some filters or searching for another term.</p>
+                <a href="{% url 'products:list' %}" class="btn btn-luxury-apply px-4">Clear filters</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/products.js' %}"></script>
+<script>
+// Mobile (<992px): tap the dim overlay backdrop to close the filter bottom-sheet
+(function () {
+    var layout = document.getElementById('shopCatalogLayout');
+    if (!layout) return;
+
+    layout.addEventListener('click', function (e) {
+        if (window.innerWidth >= 992) return;
+        if (layout.classList.contains('is-filters-collapsed')) return;
+        
+        var sidebar = document.getElementById('shopFiltersSidebar');
+        if (sidebar && sidebar.contains(e.target)) return;
+        
+        var verticalTab = document.getElementById('filtersVerticalTab');
+        if (verticalTab && (verticalTab === e.target || verticalTab.contains(e.target))) return;
+
+        var toggleBtn = document.getElementById('toggleFiltersBtn');
+        if (toggleBtn && (toggleBtn === e.target || toggleBtn.contains(e.target))) return;
+
+        var closeBtn = document.getElementById('closeFiltersBtn');
+        if (closeBtn) closeBtn.click();
+    });
+})();
+</script>
+{% endblock %}

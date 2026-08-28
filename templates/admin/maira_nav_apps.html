@@ -1,0 +1,14 @@
+{% load i18n %}
+{% if available_apps %}
+  {% for app in available_apps %}
+    <div class="maira-nav-app {% if app.app_url in request.path|urlencode %}active{% endif %}">
+      <a href="{{ app.app_url }}" class="maira-nav-app-title">{{ app.name }}</a>
+      {% for model in app.models %}
+        <a href="{{ model.admin_url }}"
+           class="maira-nav-model {% if model.admin_url in request.path|urlencode %}active{% endif %}">
+          {{ model.name }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endif %}

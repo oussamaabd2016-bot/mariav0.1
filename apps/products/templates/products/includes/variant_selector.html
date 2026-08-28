@@ -1,0 +1,27 @@
+{% comment %}
+Reusable variant selector for the product detail page.
+Expects context: variants (queryset), colors (list), sizes (list).
+{% endcomment %}
+{% if colors %}
+    <div class="mb-3 variant-group">
+        <label for="variant-color" class="form-label small fw-bold">Colour</label>
+        <select name="color" id="variant-color" class="form-select">
+            <option value="">Select colour</option>
+            {% for color in colors %}
+                <option value="{{ color.id }}">{{ color.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endif %}
+
+{% if sizes %}
+    <div class="mb-3 variant-group">
+        <label for="variant-size" class="form-label small fw-bold">Size</label>
+        <select name="size" id="variant-size" class="form-select">
+            <option value="">Select size</option>
+            {% for size in sizes %}
+                <option value="{{ size.id }}">{{ size.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endif %}

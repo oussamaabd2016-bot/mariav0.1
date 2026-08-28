@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shopping cart — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cart</li>
+    </ol>
+</nav>
+
+{# Page heading #}
+<div class="d-flex align-items-center gap-3 mb-5">
+    <h1 class="section-title mb-0" style="font-size: 2rem;">Your Cart</h1>
+    {% if cart_count %}
+        <span class="badge px-3 py-2" style="background: rgba(212,175,55,0.15); color: var(--maira-accent); font-family: var(--maira-sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; border-radius: 2rem;">
+            {{ cart_count }} item{{ cart_count|pluralize }}
+        </span>
+    {% endif %}
+</div>
+
+<div id="cart-content">
+    {% if items %}
+        <div class="row g-5">
+
+            {# Left — Cart items #}
+            <div class="col-lg-8">
+                <div class="cart-items-card" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.5rem; border: 1px solid rgba(212,175,55,0.15); overflow: hidden;">
+                    <ul class="list-unstyled mb-0">
+                        {% for item in items %}
+                            <li class="cart-item d-flex gap-4 p-4 {% if not forloop.last %}border-bottom{% endif %}" style="border-color: rgba(212,175,55,0.12) !important;">
+
+                                {# Product image #}
+                                <a href="{{ item.product.get_absolute_url }}" class="flex-shrink-0" style="width: 90px; height: 90px; border-radius: 0.85rem; overflow: hidden; display: block; background: var(--maira-light-gray);">
+                                    {% if item.product.main_image %}
+                                        <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" style="width:100%; height:100%; object-fit:cover;">
+                                    {% else %}
+                                        <img src="{% static 'img/placeholder.svg' %}" alt="{{ item.product.name }}" style="width:100%; height:100%; object-fit:cover;">
+                                    {% endif %}
+                                </a>
+
+                                {# Product info #}
+                                <div class="flex-grow-1 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <small class="text-muted text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em;">{{ item.product.category.name }}</small>
+                                        <h2 class="h6 mb-1 mt-1">
+                                            <a class="text-dark text-decoration-none" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                        </h2>
+                                        {% if item.variant %}
+                                            <small class="text-muted">{{ item.variant }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 mt-2">
+                                        <form method="post" action="{% url 'cart:update' %}" class="cart-qty-form d-flex align-items-center gap-2" data-item-id="{{ item.id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <label for="qty-{{ item.id }}" class="visually-hidden">Quantity</label>
+                                            <input type="number" id="qty-{{ item.id }}" name="quantity" value="{{ item.quantity }}" min="0"
+                                                   class="form-control form-control-sm cart-qty-input text-center"
+                                                   style="width: 72px; border-radius: 0.6rem; border-color: rgba(212,175,55,0.3);">
+                                        </form>
+                                        <form method="post" action="{% url 'cart:remove' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <button type="submit" class="btn btn-link p-0 text-muted" aria-label="Remove {{ item.product.name }}" style="font-size: 0.75rem; text-decoration: none;">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+                                                Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                {# Line total #}
+                                <div class="text-end flex-shrink-0">
+                                    <div class="fw-bold cart-line-total" style="font-family: var(--maira-serif); font-size: 1.1rem;">{{ item.line_total|floatformat:2 }} MAD</div>
+                                    <small class="text-muted" style="font-size: 0.72rem;">{{ item.unit_price|floatformat:2 }} each</small>
+                                </div>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{% url 'products:list' %}" class="text-decoration-none small text-muted">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><polyline points="15 18 9 12 15 6"/></svg>
+                        Continue shopping
+                    </a>
+                </div>
+            </div>
+
+            {# Right — Order summary #}
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 5rem;">
+                    <div style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 1.5rem; border: 1px solid rgba(212,175,55,0.2); padding: 1.75rem;">
+
+                        <h2 class="h6 text-uppercase fw-bold mb-4" style="letter-spacing: 0.1em;">Order Summary</h2>
+
+                        <div id="cart-totals">
+                            <div class="d-flex justify-content-between small mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span class="fw-semibold">{{ subtotal|floatformat:2 }} MAD</span>
+                            </div>
+
+                            {% if coupon_valid %}
+                                <div class="d-flex justify-content-between small mb-2">
+                                    <span class="text-muted">Coupon <code class="small">{{ cart.coupon.code }}</code></span>
+                                    <span style="color: var(--maira-accent);">−{{ coupon_discount|floatformat:2 }} MAD</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between small mb-3">
+                                <span class="text-muted">Shipping</span>
+                                <span>{% if shipping %}{{ shipping|floatformat:2 }} MAD{% else %}<span style="color: var(--maira-accent);">Free</span>{% endif %}</span>
+                            </div>
+
+                            {% if subtotal < free_shipping_threshold %}
+                                <p class="small mb-3 px-3 py-2" style="background: rgba(212,175,55,0.08); border-radius: 0.75rem; color: var(--maira-accent); border-left: 3px solid var(--maira-gold);">
+                                    Add <strong>{{ free_shipping_remaining|floatformat:2 }} MAD</strong> more for free shipping.
+                                </p>
+                            {% endif %}
+
+                            <div class="border-top pt-3 mb-4" style="border-color: rgba(212,175,55,0.15) !important;">
+                                <div class="d-flex justify-content-between fw-bold">
+                                    <span>Total</span>
+                                    <span style="font-family: var(--maira-serif); font-size: 1.25rem;">{{ total|floatformat:2 }} MAD</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Coupon form #}
+                        <form method="post" action="{% url 'cart:apply_coupon' %}" class="mb-3">
+                            {% csrf_token %}
+                            <div class="input-group input-group-sm" style="border-radius: 0.75rem; overflow: hidden;">
+                                <input type="text" name="code" class="form-control" placeholder="Coupon code"
+                                       value="{{ cart.coupon.code|default:'' }}" aria-label="Coupon code"
+                                       style="border-color: rgba(212,175,55,0.3); border-right: none;">
+                                <button class="btn btn-outline-dark" type="submit" style="border-color: rgba(212,175,55,0.3); font-size: 0.75rem; letter-spacing: 0.05em;">Apply</button>
+                            </div>
+                        </form>
+                        {% if cart.coupon %}
+                            <form method="post" action="{% url 'cart:remove_coupon' %}" class="mb-3">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link btn-sm p-0" style="color: #c0392b; font-size: 0.75rem; text-decoration: none;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                    Remove coupon
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-dark w-100 py-2 text-uppercase fw-semibold mt-1"
+                           style="border-radius: 0.75rem; letter-spacing: 0.1em; font-size: 0.82rem;">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-2"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                            Proceed to checkout
+                        </a>
+
+                        <p class="text-muted text-center mt-3 mb-0" style="font-size: 0.68rem; letter-spacing: 0.06em;">
+                            🔒 Cash on delivery · Bank transfer
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        {# Empty cart #}
+        <div class="text-center py-5 my-5">
+            <div style="font-size: 4rem; opacity: 0.15; margin-bottom: 1.5rem;">
+                <svg width="64" height="64" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+            </div>
+            <h2 class="section-title mb-2" style="font-size: 1.8rem;">Your cart is empty</h2>
+            <p class="text-muted mb-4">Discover our curated jewellery collections.</p>
+            <a href="{% url 'products:list' %}" class="btn btn-dark px-5 py-2 text-uppercase"
+               class="btn-pill">
+                Start Shopping
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}"></script>
+{% endblock %}

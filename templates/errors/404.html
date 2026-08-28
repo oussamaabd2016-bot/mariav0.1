@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-5{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 fw-bold" style="font-family:var(--maira-serif); color:var(--maira-gold);">404</h1>
+    <p class="lead">The page you're looking for doesn't exist.</p>
+    <p class="text-muted">It may have been moved, renamed, or is simply unavailable.</p>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <a class="btn btn-gold" href="{% url 'home:index' %}">Back to home</a>
+        <a class="btn btn-outline-dark" href="{% url 'products:list' %}">Shop jewelry</a>
+    </div>
+</div>
+{% endblock %}

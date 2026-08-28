@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy policy — Maira Bijouterie{% endblock %}
+
+{% block meta_description %}How Maira Bijouterie collects, uses and protects your personal data.{% endblock %}
+
+{% block main_classes %}container my-5{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Privacy policy</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="h3 fw-bold mb-4">Privacy policy</h1>
+        <p class="text-muted">Last updated: {% now "F Y" %}</p>
+
+        <h2 class="h6 fw-bold">1. Information we collect</h2>
+        <p>We collect the information you provide when creating an account, placing an order, subscribing to our newsletter or contacting us: name, email, phone, shipping address and payment preference.</p>
+
+        <h2 class="h6 fw-bold mt-4">2. How we use your information</h2>
+        <p>We use your information to process orders, arrange delivery, provide customer support, send order updates and — only with your consent — share news and offers. We never sell your personal data.</p>
+
+        <h2 class="h6 fw-bold mt-4">3. Cookies &amp; sessions</h2>
+        <p>Our site uses sessions to keep you signed in and to remember your cart and wishlist. No third-party advertising cookies are used at launch.</p>
+
+        <h2 class="h6 fw-bold mt-4">4. Payments</h2>
+        <p>Cash on delivery requires no online payment details. Bank transfer orders are confirmed manually. Full card payment (if added later) is processed by a certified payment provider, never stored by us.</p>
+
+        <h2 class="h6 fw-bold mt-4">5. Your rights</h2>
+        <p>You may request a copy of your data or ask us to delete it at any time by contacting <a href="mailto:hello@maira.ma" class="text-decoration-none">hello@maira.ma</a>.</p>
+    </div>
+</div>
+{% endblock %}

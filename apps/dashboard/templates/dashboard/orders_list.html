@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My orders — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}" class="text-decoration-none text-dark">My account</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Orders</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <h1 class="section-title mb-0" style="font-size: 2rem;">Order History</h1>
+</div>
+
+{# Status filter pills #}
+<ul class="nav nav-pills mb-4 gap-2 border-0 pb-1" style="overflow-x: auto; flex-wrap: nowrap;">
+    <li class="nav-item">
+        <a class="nav-link px-4 py-2 text-uppercase fw-semibold {% if current_status == '' %}bg-dark text-white{% else %}bg-transparent text-dark{% endif %}"
+           href="{% url 'dashboard:orders' %}"
+           style="border-radius: 2rem; font-size: 0.72rem; letter-spacing: 0.08em; border: 1px solid {% if current_status == '' %}transparent{% else %}rgba(212,175,55,0.3){% endif %}; white-space: nowrap;">
+            All Orders
+        </a>
+    </li>
+    {% for value, label in statuses %}
+        <li class="nav-item">
+            <a class="nav-link px-4 py-2 text-uppercase fw-semibold {% if current_status == value %}bg-dark text-white{% else %}bg-transparent text-dark{% endif %}"
+               href="{% url 'dashboard:orders' %}?status={{ value }}"
+               style="border-radius: 2rem; font-size: 0.72rem; letter-spacing: 0.08em; border: 1px solid {% if current_status == value %}transparent{% else %}rgba(212,175,55,0.3){% endif %}; white-space: nowrap;">
+                {{ label }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+
+<div class="row">
+    <div class="col-12">
+        {% if orders %}
+            <div class="card-frosted">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(212,175,55,0.12);">
+                                <th class="px-4 py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Order</th>
+                                <th class="py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Date</th>
+                                <th class="py-3 text-uppercase fw-semibold text-muted d-none d-md-table-cell" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Payment</th>
+                                <th class="py-3 text-uppercase fw-semibold text-muted d-none d-sm-table-cell" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Items</th>
+                                <th class="py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Status</th>
+                                <th class="py-3 text-uppercase fw-semibold text-muted text-end pe-4" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr style="border-bottom: 1px solid rgba(212,175,55,0.08);">
+                                    <td class="px-4 py-4" style="border: none;">
+                                        <a class="fw-semibold text-decoration-none text-dark" href="{% url 'dashboard:order_detail' order.pk %}">
+                                            {{ order.order_number }}
+                                        </a>
+                                    </td>
+                                    <td class="py-4 text-muted" style="border: none;">{{ order.created_at|date:"d M Y" }}</td>
+                                    <td class="py-4 text-muted d-none d-md-table-cell" style="border: none;">
+                                        {% if order.payment_method == 'cod' %}
+                                            <span title="Cash on Delivery">COD</span>
+                                        {% else %}
+                                            {{ order.get_payment_method_display }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-4 text-muted d-none d-sm-table-cell" style="border: none;">{{ order.item_count }}</td>
+                                    <td class="py-4" style="border: none;">
+                                        <span class="badge py-1 px-3 {% if order.status == 'cancelled' %}bg-danger{% elif order.status == 'delivered' %}bg-success{% elif order.status == 'processing' %}bg-info text-dark{% else %}bg-dark{% endif %}"
+                                              style="font-size: 0.68rem; letter-spacing: 0.04em; border-radius: 1rem; font-weight: 500;">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 pe-4 text-end fw-bold" style="border: none; font-family: var(--maira-serif); font-size: 1.05rem;">
+                                        {{ order.total|floatformat:2 }} MAD
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-5" style="border: none;">No orders in this category.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5 my-5">
+                <div style="font-size: 4rem; opacity: 0.15; margin-bottom: 1.5rem;">
+                    <svg width="64" height="64" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                </div>
+                <h2 class="section-title mb-2" style="font-size: 1.8rem;">No orders yet</h2>
+                <p class="text-muted mb-4">Discover our curated jewellery collections.</p>
+                <a href="{% url 'products:list' %}" class="btn btn-dark px-5 py-2 text-uppercase"
+                   class="btn-pill">
+                    Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

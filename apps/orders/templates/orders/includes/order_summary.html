@@ -1,0 +1,50 @@
+{% comment %}
+Reusable order summary component.
+Usage: {% include "orders/includes/order_summary.html" with order=order %}
+Renders the item list, totals and payment method.
+{% endcomment %}
+<div class="p-4 p-md-5">
+    <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.14em;">Order Summary</h2>
+    
+    <ul class="list-unstyled mb-0">
+        {% for item in order.items.all %}
+            <li class="d-flex justify-content-between align-items-start py-2" style="border-bottom: 1px solid rgba(212,175,55,0.1); font-size: 0.85rem;">
+                <span class="text-dark">
+                    <span style="color: var(--maira-accent); font-weight: 600; margin-right: 0.35rem;">{{ item.quantity }}×</span>
+                    {{ item.product_name }}
+                    {% if item.variant_label %}<span class="text-muted ms-1">({{ item.variant_label }})</span>{% endif %}
+                </span>
+                <span class="ms-3 text-nowrap fw-semibold">{{ item.line_total|floatformat:2 }} MAD</span>
+            </li>
+        {% empty %}
+            <li class="text-muted text-center py-3">No items recorded for this order.</li>
+        {% endfor %}
+    </ul>
+    
+    <div class="mt-4 pt-2">
+        <div class="d-flex justify-content-between small mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span class="fw-semibold">{{ order.subtotal|floatformat:2 }} MAD</span>
+        </div>
+        {% if order.coupon_code %}
+            <div class="d-flex justify-content-between small mb-2">
+                <span class="text-muted">Coupon <code class="small">{{ order.coupon_code }}</code></span>
+                <span style="color: var(--maira-accent);">−{{ order.discount|floatformat:2 }} MAD</span>
+            </div>
+        {% endif %}
+        <div class="d-flex justify-content-between small mb-3">
+            <span class="text-muted">Shipping</span>
+            <span>{% if order.shipping > 0 %}{{ order.shipping|floatformat:2 }} MAD{% else %}<span style="color: var(--maira-accent);">Free</span>{% endif %}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between fw-bold pt-3" style="border-top: 1px solid rgba(212,175,55,0.15);">
+            <span>Total</span>
+            <span style="font-family: var(--maira-serif); font-size: 1.3rem;">{{ order.total|floatformat:2 }} MAD</span>
+        </div>
+    </div>
+    
+    <div class="mt-4 pt-3 text-center text-muted d-flex align-items-center justify-content-center gap-2" style="font-size: 0.72rem; letter-spacing: 0.05em; border-top: 1px solid rgba(212,175,55,0.1);">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Payment method: <span class="fw-semibold text-dark">{{ order.get_payment_method_display }}</span>
+    </div>
+</div>

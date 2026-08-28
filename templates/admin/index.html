@@ -1,0 +1,168 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+/* Dashboard page styles */
+.dashboard-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+.dashboard-subtitle {
+    color: var(--body-quiet-color);
+    font-size: 14px;
+    margin: 0 0 28px 0;
+}
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+}
+.quick-card {
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-decoration: none;
+    color: var(--body-fg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    cursor: pointer;
+}
+.quick-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    color: var(--primary);
+    text-decoration: none;
+}
+.quick-card svg {
+    width: 28px; height: 28px;
+    stroke: currentColor; stroke-width: 1.8; fill: none;
+}
+.section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--body-quiet-color);
+    font-weight: 700;
+    margin: 0 0 14px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hairline-color);
+}
+/* Recent actions panel */
+#recent-actions-module h2 { font-size: 15px; margin-bottom: 12px; }
+#recent-actions-module .actionlist { padding: 0; list-style: none; margin: 0; }
+#recent-actions-module .actionlist li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hairline-color);
+    font-size: 13px;
+}
+#recent-actions-module .actionlist li:last-child { border-bottom: none; }
+#recent-actions-module .mini { font-size: 11px; color: var(--body-quiet-color); }
+/* Layout: content + recent actions side by side */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 30px;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .dashboard-layout { grid-template-columns: 1fr; }
+}
+.dashboard-card {
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 22px 20px;
+}
+</style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block breadcrumbs %}<a href="{% url 'admin:index' %}">Home</a>{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<div style="padding: 0;">
+
+  <h1 class="dashboard-title">Site Administration</h1>
+  <p class="dashboard-subtitle">Welcome back, <strong>{% firstof user.get_short_name user.get_username %}</strong>. Manage everything below.</p>
+
+  {# Quick actions #}
+  <p class="section-label">Quick Actions</p>
+  <div class="quick-grid">
+    <a href="{% url 'admin:orders_order_changelist' %}" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg>
+      Manage Orders
+    </a>
+    <a href="{% url 'admin:products_product_changelist' %}" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
+      Products
+    </a>
+    <a href="{% url 'admin:products_product_add' %}" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Add Product
+    </a>
+    <a href="{% url 'admin:accounts_user_changelist' %}" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Customers
+    </a>
+    <a href="{% url 'admin:reviews_review_changelist' %}" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Reviews
+    </a>
+    <a href="/dashboard/" class="quick-card">
+      <svg viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></svg>
+      Analytics
+    </a>
+  </div>
+
+  {# Two column layout: app list + recent actions #}
+  <div class="dashboard-layout">
+    <div>
+      <p class="section-label">All Applications</p>
+      {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    </div>
+    <div>
+      <p class="section-label">Recent Actions</p>
+      <div class="dashboard-card" id="recent-actions-module">
+        {% load log %}
+        {% get_admin_log 12 as admin_log for_user user %}
+        {% if not admin_log %}
+          <p style="color: var(--body-quiet-color); font-size: 13px; margin: 0;">No recent actions.</p>
+        {% else %}
+          <ul class="actionlist">
+          {% for entry in admin_log %}
+            <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% elif entry.is_deletion %}deletelink{% endif %}">
+              {% if entry.is_deletion or not entry.get_admin_url %}
+                {{ entry.object_repr }}
+              {% else %}
+                <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+              {% endif %}
+              <br>
+              {% if entry.content_type %}
+                <span class="mini">{{ entry.content_type.name|capfirst }}</span>
+              {% else %}
+                <span class="mini">Unknown</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

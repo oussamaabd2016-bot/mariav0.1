@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order confirmed — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        {# Confirmation header #}
+        <div class="text-center mb-5 py-4">
+            {# Gold checkmark circle #}
+            <div class="mx-auto mb-4 d-flex align-items-center justify-content-center"
+                 style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border: 2px solid rgba(212,175,55,0.3);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--maira-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </div>
+            <h1 class="section-title mb-2" style="font-size: 2.2rem;">Thank you!</h1>
+            <p class="text-muted mb-1">Your order has been placed successfully.</p>
+            <p class="small text-muted">
+                Order <strong class="text-dark">{{ order.order_number }}</strong> is
+                <span class="badge bg-dark px-3 py-1" style="border-radius: 1rem; font-size: 0.72rem;">{{ order.get_status_display }}</span>
+            </p>
+            <p class="text-muted small mt-2">We'll contact you at <strong>{{ order.phone }}</strong> to confirm delivery.</p>
+        </div>
+
+        {# Order summary #}
+        <div class="mb-4" class="card-frosted">
+            {% include "orders/includes/order_summary.html" with order=order %}
+        </div>
+
+        {# Bank transfer block #}
+        {% if order.payment_method == 'bank_transfer' %}
+            <div class="mb-4 p-4" style="background: rgba(212,175,55,0.06); border-radius: 1.25rem; border: 1.5px solid rgba(212,175,55,0.3);">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <svg width="18" height="18" fill="none" stroke="var(--maira-gold)" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4"/></svg>
+                    <h2 class="mb-0 fw-bold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.1em;">Bank transfer details</h2>
+                </div>
+                <pre class="mb-3 small" style="background: none; padding: 0; color: var(--maira-dark);">{{ BANK_TRANSFER_DETAILS }}</pre>
+                <p class="small mb-0 text-muted">Please use <strong>{{ order.order_number }}</strong> as the payment reference.</p>
+            </div>
+        {% endif %}
+
+        {# WhatsApp CTA #}
+        <div class="mb-5 p-4 text-center" class="card-frosted">
+            <div class="mb-2" style="font-size: 1.75rem; opacity: 0.6;">💬</div>
+            <h2 class="fw-bold mb-1" style="font-size: 1rem; font-family: var(--maira-serif);">Confirm via WhatsApp</h2>
+            <p class="text-muted small mb-3">Send us your order on WhatsApp so we can confirm it faster and answer any questions.</p>
+            <a href="{{ order.whatsapp_link }}" target="_blank" rel="noopener"
+               class="btn w-100 py-2 fw-semibold text-white"
+               style="background: #25D366; border: none; border-radius: 0.75rem; letter-spacing: 0.06em; font-size: 0.85rem;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-2">
+                    <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
+                </svg>
+                Send order to WhatsApp
+            </a>
+        </div>
+
+        <div class="text-center">
+            <a href="{% url 'products:list' %}" class="btn btn-outline-dark px-5 py-2 text-uppercase"
+               style="border-radius: 2rem; letter-spacing: 0.1em; font-size: 0.78rem; border-color: rgba(212,175,55,0.3);">
+                Continue shopping
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

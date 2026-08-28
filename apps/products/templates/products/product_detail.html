@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+{% load core_tags %}
+
+{% block title %}{{ product.name }} — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="text-decoration-none text-dark">Shop</a></li>
+        <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.category.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4 align-items-start">
+    <!-- Left: Interactive Luxury Gallery -->
+    <div class="col-lg-6 mb-4">
+        <div class="product-gallery-container">
+            <div class="product-gallery-main mb-3 rounded-4 overflow-hidden border">
+                {% if gallery %}
+                    <img id="productMainImg" src="{{ gallery.0.url }}" class="img-fluid w-100 product-detail-main-img" alt="{{ product.name }}">
+                {% elif product.main_image %}
+                    <img id="productMainImg" src="{{ product.main_image.url }}" class="img-fluid w-100 product-detail-main-img" alt="{{ product.name }}">
+                {% else %}
+                    <img id="productMainImg" src="{% static 'img/placeholder.svg' %}" class="img-fluid w-100 product-detail-main-img" alt="{{ product.name }}">
+                {% endif %}
+            </div>
+
+            {% if gallery|length > 1 %}
+                <div class="d-flex flex-wrap gap-2 product-thumbnails-row">
+                    {% for image in gallery %}
+                        <button type="button" class="product-thumb-btn {% if forloop.first %}active{% endif %}" onclick="document.getElementById('productMainImg').src='{{ image.url }}'; document.querySelectorAll('.product-thumb-btn').forEach(b => b.classList.remove('active')); this.classList.add('active');" aria-label="View photo {{ forloop.counter }}">
+                            <img src="{{ image.url }}" class="img-fluid rounded-3" alt="{{ product.name }} view {{ forloop.counter }}">
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right: Product Info & Actions -->
+    <div class="col-lg-6 ps-lg-4">
+        <small class="text-muted text-uppercase letter-spacing-1">{{ product.category.name }}</small>
+        <h1 class="h2 mb-1 product-detail-title">{{ product.name }}</h1>
+        {% if product.brand %}
+            <p class="text-muted mb-2"><small>{{ product.brand.name }}</small></p>
+        {% endif %}
+
+        <div class="mb-3">
+            {% include "products/includes/price_display.html" with product=product %}
+        </div>
+
+        {% if product.short_description %}
+            <p class="text-muted">{{ product.short_description }}</p>
+        {% endif %}
+
+        <ul class="list-unstyled small mb-4 product-features-list">
+            {% if product.material %}<li><strong>Material:</strong> {{ product.material.name }}</li>{% endif %}
+            {% if product.gold_plated %}<li><strong>Gold plated:</strong> Yes</li>{% endif %}
+            {% if product.stainless_steel %}<li><strong>Stainless steel:</strong> Yes</li>{% endif %}
+            {% if product.waterproof %}<li><strong>Waterproof:</strong> Yes</li>{% endif %}
+            {% if product.tarnish_resistant %}<li><strong>Tarnish resistant:</strong> Yes</li>{% endif %}
+        </ul>
+
+        <!-- Add to Cart Form -->
+        <form method="post" action="{% url 'cart:add' %}" id="add-to-cart-form" class="mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+
+            {% if variants %}
+                {% include "products/includes/variant_selector.html" %}
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="quantity" class="form-label small fw-bold">Quantity</label>
+                <input type="number" id="quantity" name="quantity" class="form-control luxury-input" min="1" value="1" style="max-width:120px;">
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase letter-spacing-1 fw-bold btn-luxury-cart" {% if not product.in_stock %}disabled{% endif %}>
+                {% if product.in_stock %}Add to cart{% else %}Out of stock{% endif %}
+            </button>
+        </form>
+
+        <!-- Wishlist Form (Placed below Add to Cart) -->
+        <form method="post" action="{% url 'wishlist:add' product.id %}" class="w-100">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ product.get_absolute_url }}">
+            <button type="submit" class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2 btn-luxury-wishlist">
+                <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <span>Add to Wishlist</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if product.description %}
+    <div class="row mt-5 pt-3">
+        <div class="col-12">
+            <h2 class="h5 fw-bold text-uppercase letter-spacing-1 mb-3">Description</h2>
+            <div class="product-description-content text-muted lh-lg">
+                {{ product.description|linebreaksbr }}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Generous space between Description and Customer Reviews -->
+<div class="product-reviews-wrapper mt-5 pt-5 mb-5 border-top">
+    {% include "reviews/product_reviews.html" %}
+</div>
+
+{% if related_products %}
+    <div class="row mt-5 pt-3 border-top">
+        <div class="col-12 mb-3">
+            <h2 class="h5 fw-bold text-uppercase letter-spacing-1">You may also like</h2>
+        </div>
+        <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 compact-product-grid">
+            {% for related in related_products %}
+                {% include "products/includes/product_card.html" with product=related %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% if recently_viewed %}
+    <div class="row mt-5 pt-3 border-top">
+        <div class="col-12 mb-3">
+            <h2 class="h5 fw-bold text-uppercase letter-spacing-1">Recently viewed</h2>
+        </div>
+        <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 compact-product-grid">
+            {% for viewed in recently_viewed %}
+                {% if viewed.id != product.id %}
+                    {% include "products/includes/product_card.html" with product=viewed %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/products.js' %}"></script>
+{% endblock %}

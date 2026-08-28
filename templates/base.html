@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    <title>{% block title %}Maira Bijouterie{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Maira Bijouterie — Moroccan affordable-luxury jewelry. Gold-plated, stainless steel and sterling silver pieces delivered across Morocco.{% endblock %}">
+    {% block meta %}
+        <meta property="og:title" content="Maira Bijouterie">
+        <meta property="og:description" content="Moroccan affordable-luxury jewelry — gold-plated, stainless steel and sterling silver.">
+        <meta property="og:type" content="website">
+    {% endblock %}
+    <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% include "includes/navbar.html" %}
+
+    <main class="flex-grow-1 {% block main_classes %}container{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "includes/footer.html" %}
+
+    {% if messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container"
+             aria-live="polite" aria-atomic="true">
+            {% for message in messages %}
+                <div class="toast align-items-center border-0 shadow-lg my-2 message-toast"
+                     role="alert" aria-atomic="true" data-bs-delay="4500"
+                     data-message-tag="{{ message.tags|default:'info' }}">
+                    <div class="d-flex">
+                        <div class="toast-body">{{ message }}</div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

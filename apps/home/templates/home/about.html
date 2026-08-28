@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About us — Maira Bijouterie{% endblock %}
+
+{% block meta_description %}The story of Maira Bijouterie — Moroccan affordable-luxury jewelry crafted for everyday elegance.{% endblock %}
+
+{% block main_classes %}container my-5{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-5">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">About</li>
+    </ol>
+</nav>
+
+{# Hero section #}
+<div class="row align-items-center g-5 mb-6 mb-5">
+    <div class="col-lg-6">
+        <p class="text-overline mb-2">Our story</p>
+        <h1 class="section-title mb-4" style="font-size: 2.8rem; line-height: 1.15;">Timeless jewellery,<br>crafted for every day.</h1>
+        <p class="brand-story-text mb-4">
+            Maira Bijouterie was born in Casablanca with a simple belief: luxury jewelry shouldn't be out of reach. We bring together gold-plated, stainless steel and sterling silver pieces finished to a high standard — so you can wear them every day, without worry.
+        </p>
+        <p class="brand-story-text mb-4">
+            Every item in our collection is chosen for its finish, durability and everyday wearability. Waterproof and tarnish-resistant pieces are our signature — jewelry that keeps up with your life, not the other way around.
+        </p>
+        <p class="brand-story-text mb-5">
+            From our atelier to your door across Morocco, we offer cash on delivery, bank transfer and personal support over WhatsApp — in French and Arabic.
+        </p>
+        <a class="btn btn-dark px-5 py-2 text-uppercase" href="{% url 'products:list' %}"
+           class="btn-pill">
+            Shop the collection
+        </a>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="row g-3">
+            {# Decorative value cards #}
+            <div class="col-6">
+                <div class="p-4 h-100 text-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.2);">
+                    <div class="mb-3" style="font-size: 2rem;">✦</div>
+                    <h3 style="font-family: var(--maira-serif); font-size: 1.05rem; margin-bottom: 0.5rem;">Quality</h3>
+                    <p class="text-muted small mb-0">Direct sourcing, honest prices — no markup.</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-4 h-100 text-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.2);">
+                    <div class="mb-3" style="font-size: 2rem;">💧</div>
+                    <h3 style="font-family: var(--maira-serif); font-size: 1.05rem; margin-bottom: 0.5rem;">Durability</h3>
+                    <p class="text-muted small mb-0">Waterproof & tarnish-resistant finishes.</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-4 h-100 text-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.2);">
+                    <div class="mb-3" style="font-size: 2rem;">💬</div>
+                    <h3 style="font-family: var(--maira-serif); font-size: 1.05rem; margin-bottom: 0.5rem;">Personal service</h3>
+                    <p class="text-muted small mb-0">Real WhatsApp support in French & Arabic.</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-4 h-100 text-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.2);">
+                    <div class="mb-3" style="font-size: 2rem;">🇲🇦</div>
+                    <h3 style="font-family: var(--maira-serif); font-size: 1.05rem; margin-bottom: 0.5rem;">Proudly Moroccan</h3>
+                    <p class="text-muted small mb-0">Designed & curated in Casablanca.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Divider #}
+<div class="my-5" style="height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);"></div>
+
+{# Promise strip #}
+<div class="row g-4 text-center mb-5">
+    <div class="col-md-4">
+        <p class="text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.15em; color: var(--maira-accent);">Delivery</p>
+        <p class="fw-semibold mb-0" style="font-size: 0.9rem;">Cash on delivery across Morocco</p>
+    </div>
+    <div class="col-md-4">
+        <p class="text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.15em; color: var(--maira-accent);">Shipping</p>
+        <p class="fw-semibold mb-0" style="font-size: 0.9rem;">Free above {{ free_shipping_threshold_display }}</p>
+    </div>
+    <div class="col-md-4">
+        <p class="text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.15em; color: var(--maira-accent);">Support</p>
+        <p class="fw-semibold mb-0" style="font-size: 0.9rem;">WhatsApp · French · Arabic</p>
+    </div>
+</div>
+
+{% endblock %}

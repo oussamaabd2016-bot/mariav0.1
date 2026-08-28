@@ -1,0 +1,14 @@
+# Maira Bijouterie - Python dependencies
+# Pinned stack (do not substitute): Django 5.1, Python 3.12
+Django>=5.1,<5.2
+django-environ==0.14.0
+Pillow>=10.0
+django-crispy-forms==2.5
+crispy-bootstrap5==2026.3
+whitenoise==6.12.0
+dj-database-url==3.1.2
+psycopg[binary]>=3.1
+
+# Production WSGI server (Unix deployments only)
+gunicorn>=22.0
+requests>=2.31

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Maira Bijouterie — Moroccan Affordable-Luxury Jewelry{% endblock %}
+
+{% block meta_description %}Shop gold-plated, stainless steel and sterling silver jewelry in Morocco. Free shipping over {{ free_shipping_threshold_display }}, cash on delivery available.{% endblock %}
+
+{% block main_classes %}{% endblock %}
+
+{% block content %}
+
+{# ---- Top-to-Bottom Unified Editorial Background Wrapper ------------ #}
+<div class="hero-combined-wrapper position-relative overflow-hidden">
+    {# 1. Hero & Brand Introduction -------------------------------------- #}
+    <section class="hero position-relative pt-1 pb-0">
+        <div class="container position-relative">
+            <div class="row justify-content-center align-items-center text-center pt-0 pb-1">
+                <div class="col-lg-10">
+                    <div class="hero-logo-wrap mb-2">
+                        <img src="{% static 'img/LOGO1.png' %}" alt="Maira Bijouterie" class="hero-logo img-fluid">
+                    </div>
+                    <h1 class="hero-tagline text-uppercase mb-0">Luxury That Lives With You</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# 2. Brand Story & Collections -------------------------------------- #}
+    <section class="brand-story pt-2 pb-4">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-9 col-md-11">
+                    <p class="brand-story-text mb-4">
+                        Born in Casablanca, Maira Bijouterie creates timeless, water-resistant jewelry made for everyday luxury. Discover our signature collections below.
+                    </p>
+                </div>
+            </div>
+
+            {# The 4 Category Cards #}
+            {% if collections %}
+            <div class="my-4">
+                <div role="list" class="hover-reveal-grid">
+                    {% for item in collections %}
+                        <a role="listitem" aria-label="{{ item.category.name }}" href="{{ item.category.get_absolute_url }}" class="hover-reveal-card interactive-tilt-card" style="background-image: url('{% if item.category.slug == "necklaces" or item.category.name|lower == "necklaces" %}{% static "img/necklace_categoriess.jpeg" %}{% elif item.category.slug == "bracelets" or item.category.name|lower == "bracelets" %}{% static "img/bracelets_categories.jpeg" %}{% elif item.category.slug == "earrings" or item.category.name|lower == "earrings" %}{% static "img/earrings_categories.jpeg" %}{% elif item.image %}{{ item.image.url }}{% else %}{% static "img/placeholder.svg" %}{% endif %}');">
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# 3 Feature Dots Under The 4 Category Pictures #}
+            <div class="row justify-content-center text-center mt-4 pt-2">
+                <div class="col-lg-9 col-md-11">
+                    <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4 brand-story-features">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="brand-story-bullet">✦</span>
+                            <span>Waterproof &amp; tarnish-resistant finishes</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="brand-story-bullet">✦</span>
+                            <span>24K Gold-plated, stainless steel &amp; 925 silver</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="brand-story-bullet">✦</span>
+                            <span>Hypoallergenic, crafted for everyday wear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# 3. Meet Our Packages (3D Flip Carousel + Dynamic Text) ----------- #}
+    <section class="packages-home-section py-5">
+        <div class="container">
+            <div class="row align-items-start g-5">
+
+                <!-- Left: Dynamic text panel (driven by JS) -->
+                <div class="col-lg-6 pe-lg-5">
+                    <h2 class="section-title curated-sets-title mb-4 pb-2">Curated Sets</h2>
+
+                    <!-- Package info block — content swapped by JS -->
+                    <div id="pkg-info" class="pkg-info-block">
+                        <div class="pkg-info-name mb-2" id="pkg-name">{% if packages %}{{ packages.0.name }}{% else %}Bridal Glow Set{% endif %}</div>
+                        <p class="brand-story-text mb-3" id="pkg-desc">{% if packages %}{{ packages.0.description|default:"Curated luxury package with matching jewellery." }}{% else %}A complete bridal look — layered pearl necklace, drop pearl earrings and signature ring.{% endif %}</p>
+                        <ul class="pkg-features list-unstyled mb-3" id="pkg-features">
+                            {% if packages %}
+                                {% for p in packages.0.products.all|slice:":3" %}
+                                    <li><span class="bullet">✦</span><span>{{ p.name }}</span></li>
+                                {% endfor %}
+                            {% else %}
+                                <li><span class="bullet">✦</span><span>Layered Pearl Necklace · delicate finish</span></li>
+                                <li><span class="bullet">✦</span><span>Drop Pearl Earrings · elegant drop silhouette</span></li>
+                                <li><span class="bullet">✦</span><span>Rose Gold Twisted Ring · signature accent</span></li>
+                            {% endif %}
+                        </ul>
+                        <div id="pkg-price-wrap" class="pkg-price mt-4 pt-3 mb-0">
+                            <span id="pkg-price-label" class="pkg-price-label">{% if packages %}{{ packages.0.final_price|floatformat:2 }} MAD{% else %}592.00 MAD{% endif %}</span>
+                            {% if packages and packages.0.original_price > packages.0.final_price %}
+                                <span id="pkg-price-original" class="pkg-price-original ms-2">{{ packages.0.original_price|floatformat:2 }} MAD</span>
+                            {% elif not packages %}
+                                <span id="pkg-price-original" class="pkg-price-original ms-2">740.00 MAD</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: 3D Layered Carousel Deck (aligned to max right) -->
+                <div class="col-lg-6 d-flex justify-content-lg-end justify-content-center">
+                    <div class="packages-3d-stage" id="packages-stage">
+                        <!-- The viewport with 3D perspective -->
+                        <div class="pkg-viewport">
+                            <div class="pkg-track" id="pkg-track">
+                                {% if packages %}
+                                    {% for pkg in packages %}
+                                        <a href="{{ pkg.get_absolute_url }}" 
+                                           class="pkg-card {% if forloop.first %}pkg-pos-active{% elif forloop.counter == 2 %}pkg-pos-right{% else %}pkg-pos-hidden{% endif %}" 
+                                           data-index="{{ forloop.counter0 }}" 
+                                           data-name="{{ pkg.name }}"
+                                           data-desc="{{ pkg.description|default:'Curated luxury package with matching jewellery.' }}"
+                                           data-price="{{ pkg.final_price|floatformat:2 }} MAD"
+                                           data-original="{% if pkg.original_price > pkg.final_price %}{{ pkg.original_price|floatformat:2 }} MAD{% endif %}"
+                                           data-features="{% for p in pkg.products.all|slice:':3' %}{{ p.name }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+                                           aria-label="{{ pkg.name }}">
+                                            <img src="{% if pkg.display_image %}{{ pkg.display_image.url }}{% else %}{% static 'img/packages_gift_box.png' %}{% endif %}"
+                                                 alt="{{ pkg.name }}"
+                                                 class="packages-floating-img img-fluid">
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <a href="{% url 'packages:index' %}" class="pkg-card pkg-pos-active" data-index="0" data-name="Bridal Glow Set" data-desc="A complete bridal look — layered pearl necklace, drop pearl earrings and signature ring." data-price="592.00 MAD" data-original="740.00 MAD" data-features="Layered Pearl Necklace|Drop Pearl Earrings|Rose Gold Twisted Ring" aria-label="Bridal Glow Set">
+                                        <img src="{% static 'img/packages_gift_box.png' %}" alt="Bridal Glow Set" class="packages-floating-img img-fluid">
+                                    </a>
+                                    <a href="{% url 'packages:index' %}" class="pkg-card pkg-pos-right" data-index="1" data-name="Everyday Gold Essentials" data-desc="The perfect starter bundle: a gold-plated chain bracelet paired with a minimal bar necklace." data-price="398.65 MAD" data-original="469.00 MAD" data-features="Gold Plated Chain Bracelet|Minimal Bar Necklace|Waterproof 24K plating" aria-label="Everyday Gold Essentials">
+                                        <img src="{% static 'img/packages_gift_box_2.png' %}" alt="Everyday Gold Essentials" class="packages-floating-img img-fluid">
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Side navigation arrows -->
+                        <button class="pkg-arrow pkg-arrow-left" id="pkg-prev" aria-label="Previous">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="pkg-arrow pkg-arrow-right" id="pkg-next" aria-label="Next">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# 4. Customers Favorites (Photo-only cards) ------------------------- #}
+    {% if top_rated_products %}
+    <section class="top-rated-section pt-3 pb-5 mb-5">
+        <div class="container mb-4">
+            <div class="text-center mb-4">
+                <h2 class="section-title mb-1">Customers Favorites</h2>
+                <p class="text-muted small text-uppercase" style="letter-spacing: 0.15em;">Curated high-rating pieces</p>
+            </div>
+            <div class="row g-3 row-cols-2 row-cols-lg-4">
+                {% for product in top_rated_products %}
+                    <div class="col">
+                        <div class="card product-photo-card h-100 border-0">
+                            <a href="{{ product.get_absolute_url }}" class="product-card-img-wrap interactive-tilt-card" aria-label="{{ product.name }}">
+                                {% if product.main_image %}
+                                    <img src="{{ product.main_image.url }}" class="card-img-top product-card-img" alt="{{ product.name }}">
+                                {% else %}
+                                    <img src="{% static 'img/placeholder.svg' %}" class="card-img-top product-card-img" alt="{{ product.name }}">
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4 pt-2">
+                <a class="text-decoration-none small text-uppercase text-dark fw-semibold link-underlined" href="{% url 'products:list' %}?sort=price_desc">
+                    Explore All Creations →
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
+

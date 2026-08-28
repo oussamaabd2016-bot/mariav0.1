@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cart:index' %}" class="text-decoration-none text-dark">Cart</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+    </ol>
+</nav>
+
+{# Step indicator #}
+<div class="d-flex align-items-center gap-3 mb-5">
+    <h1 class="section-title mb-0" style="font-size: 2rem;">Checkout</h1>
+    <div class="d-flex align-items-center gap-2 ms-2">
+        <span class="badge px-3 py-2" style="background: rgba(212,175,55,0.15); color: var(--maira-accent); font-size: 0.7rem; letter-spacing: 0.08em; border-radius: 2rem;">Secure order</span>
+    </div>
+</div>
+
+<div class="row g-5">
+    {# Left — Checkout form #}
+    <div class="col-lg-7">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {# Shipping section #}
+            <div class="mb-4">
+                <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.14em; color: var(--maira-accent);">
+                    <span class="d-inline-flex align-items-center justify-content-center me-2"
+                          style="width:22px; height:22px; background: var(--maira-dark); color:#fff; border-radius:50%; font-size:0.65rem;">1</span>
+                    Shipping details
+                </h2>
+
+                <div style="background: rgba(255,255,255,0.75); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); padding: 1.75rem;">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.full_name.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">Full name</label>
+                            {{ form.full_name }}
+                            {{ form.full_name.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">Phone</label>
+                            {{ form.phone }}
+                            {{ form.phone.errors }}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.address.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">Street address</label>
+                            {{ form.address }}
+                            {{ form.address.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.city.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">City</label>
+                            {{ form.city }}
+                            {{ form.city.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.postal_code.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">Postal code</label>
+                            {{ form.postal_code }}
+                            {{ form.postal_code.errors }}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label small fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-dark);">Order notes <span class="text-muted fw-normal">(optional)</span></label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Payment section #}
+            <div class="mb-5">
+                <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.14em; color: var(--maira-accent);">
+                    <span class="d-inline-flex align-items-center justify-content-center me-2"
+                          style="width:22px; height:22px; background: var(--maira-dark); color:#fff; border-radius:50%; font-size:0.65rem;">2</span>
+                    Payment Method
+                </h2>
+
+                <div style="background: rgba(255,255,255,0.75); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); padding: 1.75rem;">
+                    {{ form.payment_method.errors }}
+                    <div class="d-flex flex-column gap-3">
+                        {% for radio in form.payment_method %}
+                            <label class="d-flex align-items-start gap-3 p-3 cursor-pointer"
+                                   style="border: 1.5px solid rgba(212,175,55,0.2); border-radius: 0.85rem; cursor: pointer; transition: border-color 0.2s ease;">
+                                {{ radio.tag }}
+                                <div>
+                                    <div class="fw-semibold" style="font-size: 0.9rem;">{{ radio.choice_label }}</div>
+                                    {% if 'cash' in radio.choice_label|lower %}
+                                        <div class="text-muted small mt-1">Pay when your order is delivered to your door.</div>
+                                    {% else %}
+                                        <div class="text-muted small mt-1">Bank account details will be provided on the confirmation page.</div>
+                                    {% endif %}
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase fw-semibold"
+                    style="border-radius: 0.85rem; letter-spacing: 0.12em; font-size: 0.85rem; font-size: 1rem;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-2"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                Place order — {{ total|floatformat:2 }} MAD
+            </button>
+        </form>
+    </div>
+
+    {# Right — Order summary sidebar #}
+    <div class="col-lg-5">
+        <div class="sticky-top" style="top: 5rem;">
+            <div style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.2); padding: 1.75rem;">
+
+                <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.14em;">Your Order</h2>
+
+                <ul class="list-unstyled mb-0">
+                    {% for item in items %}
+                        <li class="d-flex justify-content-between align-items-start py-2" style="border-bottom: 1px solid rgba(212,175,55,0.1); font-size: 0.85rem;">
+                            <span class="text-dark">
+                                <span style="color: var(--maira-accent); font-weight: 600; margin-right: 0.35rem;">{{ item.quantity }}×</span>
+                                {{ item.product.name }}
+                                {% if item.variant %}<span class="text-muted ms-1">({{ item.variant }})</span>{% endif %}
+                            </span>
+                            <span class="ms-3 text-nowrap fw-semibold">{{ item.line_total|floatformat:2 }} MAD</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="mt-4 pt-2">
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span>{{ subtotal|floatformat:2 }} MAD</span>
+                    </div>
+                    {% if coupon_valid %}
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Coupon <code class="small">{{ cart.coupon.code }}</code></span>
+                            <span style="color: var(--maira-accent);">−{{ coupon_discount|floatformat:2 }} MAD</span>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between small mb-3">
+                        <span class="text-muted">Shipping</span>
+                        <span>{% if shipping %}{{ shipping|floatformat:2 }} MAD{% else %}<span style="color: var(--maira-accent);">Free</span>{% endif %}</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold pt-3" style="border-top: 1px solid rgba(212,175,55,0.15);">
+                        <span>Total</span>
+                        <span style="font-family: var(--maira-serif); font-size: 1.3rem;">{{ total|floatformat:2 }} MAD</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 text-center text-muted" style="font-size: 0.7rem; letter-spacing: 0.06em; border-top: 1px solid rgba(212,175,55,0.1);">
+                    🔒 &nbsp;Cash on delivery · Bank transfer · Free returns
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

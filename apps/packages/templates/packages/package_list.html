@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Jewellery sets &amp; packages — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Packages</li>
+    </ol>
+</nav>
+
+<div class="text-center mb-4">
+    <h1 class="section-title mb-2">Jewellery sets &amp; packages</h1>
+    <span class="package-header-rule mx-auto" aria-hidden="true"></span>
+    <p class="text-muted mb-0">Explore our signature matching collections crafted for effortless luxury.</p>
+</div>
+
+
+<!-- 3D Interactive Curved Cylindrical Carousel Showcase -->
+<div class="cylinder-3d-wrapper shadow-sm mb-5">
+    <!-- 3D Perspective Stage -->
+    <div id="cylinder3DStage" class="cylinder-stage">
+        <!-- Side Navigation Arrows -->
+        <button type="button" class="cylinder-arrow cylinder-arrow-prev" id="cylinderPrevBtn" aria-label="Previous package">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="cylinder-arrow cylinder-arrow-next" id="cylinderNextBtn" aria-label="Next package">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+
+        <!-- 3D Cylinder Ring with Full BG Cards -->
+        <div id="cylinder3DRing" class="cylinder-ring">
+            {% for item in carousel_cards %}
+                <article class="cylinder-card">
+                    <!-- Full Background Image -->
+                    <img src="{{ item.image }}" alt="{{ item.text }}" class="cylinder-card-bg-img" loading="lazy">
+                    <!-- Scrim Overlay for Content Contrast -->
+                    <div class="cylinder-card-overlay" aria-hidden="true"></div>
+
+                    <!-- Top Left Name -->
+                    <div class="cylinder-card-top">
+                        <h3 class="cylinder-card-title">
+                            <a href="{{ item.url }}">{{ item.text }}</a>
+                        </h3>
+                    </div>
+
+                    <!-- Bottom Price & Action Buttons -->
+                    <div class="cylinder-card-bottom">
+                        <div class="cylinder-card-price-small">
+                            <strong>{{ item.price|floatformat:2 }} MAD</strong>
+                            {% if item.original_price and item.original_price > item.price %}
+                                <s>{{ item.original_price|floatformat:2 }} MAD</s>
+                            {% endif %}
+                        </div>
+
+                        <div class="cylinder-card-actions">
+                            <form method="post" action="{% url 'packages:add_to_cart' item.slug %}" class="flex-grow-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-luxury-cart w-100 text-uppercase letter-spacing-1 fw-semibold">
+                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-1"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                                    Add to Cart
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'packages:add_to_wishlist' item.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-luxury-wishlist" title="Save to wishlist" aria-label="Save set to wishlist">
+                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Dot Navigation Indicators -->
+    <div id="cylinderDots" class="cylinder-dots"></div>
+</div>
+
+<div class="text-center mb-4">
+    <h2 class="h4 fw-bold text-uppercase letter-spacing-1 mb-1">All Available Bundles</h2>
+    <span class="package-header-rule mx-auto" aria-hidden="true"></span>
+    <p class="text-muted small">Select your complete curated package with exclusive bundle savings.</p>
+</div>
+
+{% if packages %}
+    <div class="row g-4 row-cols-1 packages-grid">
+        {% for package in packages %}
+            <div class="col">
+                <article class="package-show">
+                    <a href="{{ package.get_absolute_url }}" class="package-show-media">
+                        {% if package.show_images %}
+                            <img src="{{ package.show_images.0 }}" alt="{{ package.name }}" class="package-show-img">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.svg' %}" alt="{{ package.name }}" class="package-show-img">
+                        {% endif %}
+                        <span class="package-show-glow" aria-hidden="true"></span>
+                        {% if package.discount_percentage %}
+                            <span class="package-show-save">Save {{ package.discount_percentage }}%</span>
+                        {% endif %}
+                    </a>
+                    <div class="package-show-body">
+                        <h3 class="package-show-name">
+                            <a href="{{ package.get_absolute_url }}">{{ package.name }}</a>
+                        </h3>
+                        <span class="package-show-rule" aria-hidden="true"></span>
+                        <p class="package-show-desc">{{ package.description|truncatewords:18 }}</p>
+                        <small class="package-show-count mb-1 d-block text-muted">{{ package.products.count }} piece{{ package.products.count|pluralize }} included</small>
+                        <div class="package-show-foot d-flex flex-wrap align-items-center justify-content-between gap-3 mt-2 pt-2 border-top">
+                            <p class="package-show-price mb-0">
+                                <strong>{{ package.final_price|floatformat:2 }} MAD</strong>
+                                <s>{{ package.original_price|floatformat:2 }} MAD</s>
+                            </p>
+                            <div class="d-flex align-items-center gap-2">
+                                <form method="post" action="{% url 'packages:add_to_cart' package.slug %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-dark btn-luxury-action px-3 py-1 text-uppercase letter-spacing-1 fw-semibold">
+                                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-1"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                                        Add to Cart
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'packages:add_to_wishlist' package.slug %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-dark btn-luxury-action-outline px-2 py-1" title="Save to wishlist" aria-label="Save set to wishlist">
+                                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                    </button>
+                                </form>
+                                <a href="{{ package.get_absolute_url }}" class="btn btn-sm btn-outline-gold px-3 py-1 text-uppercase letter-spacing-1">View &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if packages.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if packages.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ packages.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Page {{ packages.number }} of {{ packages.paginator.num_pages }}</span></li>
+                {% if packages.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ packages.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <p>No packages are available right now. Check back soon!</p>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cylinder_carousel.js' %}"></script>
+{% endblock %}

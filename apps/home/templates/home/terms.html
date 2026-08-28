@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Terms &amp; conditions — Maira Bijouterie{% endblock %}
+
+{% block meta_description %}Terms and conditions for shopping at Maira Bijouterie.{% endblock %}
+
+{% block main_classes %}container my-5{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Terms &amp; conditions</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="h3 fw-bold mb-4">Terms &amp; conditions</h1>
+        <p class="text-muted">Last updated: {% now "F Y" %}</p>
+
+        <h2 class="h6 fw-bold">1. Orders</h2>
+        <p>Orders are accepted subject to stock availability. We confirm each order by WhatsApp with an order number. Prices are shown in Moroccan Dirham (MAD) including taxes.</p>
+
+        <h2 class="h6 fw-bold mt-4">2. Payment</h2>
+        <p>We accept Cash on Delivery (COD) and Bank Transfer. Bank transfer orders are dispatched once payment is confirmed.</p>
+
+        <h2 class="h6 fw-bold mt-4">3. Delivery</h2>
+        <p>Orders over {{ free_shipping_threshold_display }} ship free. Delivery times depend on your city; Casablanca is usually next day. A flat shipping fee applies to smaller orders.</p>
+
+        <h2 class="h6 fw-bold mt-4">4. Returns</h2>
+        <p>Contact us on WhatsApp within 7 days of delivery if an item is damaged or incorrect. Personalized orders are non-returnable unless faulty.</p>
+
+        <h2 class="h6 fw-bold mt-4">5. Liability</h2>
+        <p>Product photos are indicative. We are not liable for delays caused by shipping carriers or force majeure.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% load static %}
+<div id="reviews" class="row mt-5">
+    <div class="col-12">
+        <h2 class="h5 fw-bold mb-3">Customer reviews</h2>
+    </div>
+
+    {% if rating_count %}
+        <div class="col-lg-4 mb-4">
+            <div class="border rounded p-3 h-100">
+                <div class="display-4 fw-bold">{{ rating_average|floatformat:1 }}</div>
+                <div class="text-warning mb-2">
+                    {% for star in "12345" %}
+                        {% if forloop.counter <= rating_full_stars %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                    <span class="text-muted small ms-1">{{ rating_count }} review{{ rating_count|pluralize }}</span>
+                </div>
+                {% for bucket in rating_distribution %}
+                    <div class="d-flex align-items-center gap-2 small mb-1">
+                        <span class="text-muted" style="min-width:20px;">{{ bucket.stars }}★</span>
+                        <div class="progress flex-grow-1" style="height:8px;">
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                 style="width:{% widthratio bucket.count rating_count 100 %}%"></div>
+                        </div>
+                        <span class="text-muted" style="min-width:24px;">{{ bucket.count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="col-lg-{% if rating_count %}8{% else %}12{% endif %}">
+        {% if can_review %}
+            <div class="border rounded p-3 mb-4">
+                <h3 class="h6 fw-bold">Share your experience</h3>
+                <form method="post" action="{% url 'reviews:add' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ review_form.product_id }}
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Your rating</label>
+                        <select name="rating" class="form-select" style="max-width:140px;">
+                            {% for value, label in review_form.fields.rating.choices %}
+                                <option value="{{ value }}">{{ label }} star{{ value|pluralize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label for="id_comment" class="form-label small fw-bold">Your review</label>
+                        <textarea name="comment" rows="4" class="form-control" id="id_comment"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_image" class="form-label small fw-bold">Photo (optional)</label>
+                        <input type="file" name="image" id="id_image" accept="image/*" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-dark btn-sm">Submit review</button>
+                </form>
+            </div>
+        {% elif user.is_authenticated %}
+            <div class="alert alert-info small">
+                You can review this product once you've ordered it.
+            </div>
+        {% else %}
+            <div class="alert alert-light border small">
+                <a href="{% url 'accounts:login' %}">Sign in</a> to review products you've purchased.
+            </div>
+        {% endif %}
+
+        {% for review in reviews %}
+            <div class="border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong class="small">{{ review.user.get_full_name|default:review.user.email }}</strong>
+                        <div class="text-warning small">
+                            {% for star in "12345" %}
+                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ review.created_at|date:"M Y" }}</small>
+                </div>
+                {% if review.comment %}
+                    <p class="mt-2 mb-1">{{ review.comment|linebreaksbr }}</p>
+                {% endif %}
+                {% if review.image %}
+                    <img src="{{ review.image.url }}" alt="Review photo" class="rounded mt-1"
+                         style="max-height:140px; max-width:180px; object-fit:cover;">
+                {% endif %}
+            </div>
+        {% empty %}
+            {% if not rating_count %}
+                <p class="text-muted small">No reviews yet. Be the first to review this product.</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

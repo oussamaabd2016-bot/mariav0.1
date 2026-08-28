@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Staff dashboard — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container-fluid my-4 px-lg-5{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Staff dashboard</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 pb-3" class="border-bottom-gold-subtle">
+    <div>
+        <p class="text-overline mb-1">Admin area</p>
+        <h1 class="section-title mb-0" style="font-size: 2rem;">Staff Dashboard</h1>
+    </div>
+    <a href="/admin/" class="btn btn-outline-dark text-uppercase fw-semibold px-4" target="_blank" rel="noopener"
+       style="border-radius: 2rem; font-size: 0.75rem; letter-spacing: 0.08em; border-color: rgba(212,175,55,0.4);">
+        Open Django Admin <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="ms-1" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+    </a>
+</div>
+
+{# KPI Cards #}
+<div class="row g-4 mb-5">
+    <div class="col-6 col-xl-3">
+        <div class="p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.02);">
+            <div class="text-uppercase fw-semibold mb-2" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-accent);">Total Revenue</div>
+            <div style="font-family: var(--maira-serif); font-size: 2.2rem; font-weight: 700; color: var(--maira-dark); line-height: 1;">{{ revenue_total|floatformat:2 }} <span style="font-size:1rem; font-weight:500;">MAD</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.02);">
+            <div class="text-uppercase fw-semibold mb-2" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-accent);">Total Orders</div>
+            <div style="font-family: var(--maira-serif); font-size: 2.2rem; font-weight: 700; color: var(--maira-dark); line-height: 1;">{{ orders_total }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.02);">
+            <div class="text-uppercase fw-semibold mb-2" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-accent);">Avg. Order Value</div>
+            <div style="font-family: var(--maira-serif); font-size: 2.2rem; font-weight: 700; color: var(--maira-dark); line-height: 1;">{{ average_order_value|floatformat:2 }} <span style="font-size:1rem; font-weight:500;">MAD</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 1.25rem; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.02);">
+            <div class="text-uppercase fw-semibold mb-2" style="font-size: 0.68rem; letter-spacing: 0.1em; color: var(--maira-accent);">New Customers (30d)</div>
+            <div style="font-family: var(--maira-serif); font-size: 2.2rem; font-weight: 700; color: var(--maira-dark); line-height: 1;">{{ new_customers }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5">
+    {# Left column (Tables) #}
+    <div class="col-lg-8">
+        
+        {# Best Sellers #}
+        <div class="mb-5" class="card-frosted">
+            <div class="p-4" class="border-bottom-gold-light">
+                <h2 class="mb-0 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 0.12em;">Best-Selling Products</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(212,175,55,0.12);">
+                            <th class="px-4 py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none; width: 50px;">#</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Product</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted text-end" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Units</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted text-end pe-4" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in best_sellers %}
+                            <tr style="border-bottom: 1px solid rgba(212,175,55,0.08);">
+                                <td class="px-4 py-3 text-muted" style="border: none;">{{ forloop.counter }}</td>
+                                <td class="py-3" style="border: none;">
+                                    {% if item.product_id %}
+                                        <a class="text-decoration-none text-dark fw-semibold" href="/admin/products/product/{{ item.product_id }}/change/">{{ item.product__name }}</a>
+                                    {% else %}
+                                        <span class="text-dark fw-semibold">{{ item.product__name }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-end text-muted" style="border: none;">{{ item.units }}</td>
+                                <td class="py-3 pe-4 text-end fw-bold" style="border: none; font-family: var(--maira-serif); font-size: 1.05rem;">
+                                    {{ item.revenue|floatformat:2 }} <span style="font-size: 0.75rem; font-family: var(--maira-sans); font-weight: normal; color: #666;">MAD</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-5" style="border: none;">No sales recorded yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Latest Orders #}
+        <div class="card-frosted">
+            <div class="p-4" class="border-bottom-gold-light">
+                <h2 class="mb-0 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 0.12em;">Latest Orders</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(212,175,55,0.12);">
+                            <th class="px-4 py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Order</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Customer</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted d-none d-md-table-cell" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Date</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Status</th>
+                            <th class="py-3 text-uppercase fw-semibold text-muted text-end pe-4" style="font-size: 0.68rem; letter-spacing: 0.08em; border: none;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in latest_orders %}
+                            <tr style="border-bottom: 1px solid rgba(212,175,55,0.08);">
+                                <td class="px-4 py-3" style="border: none;">
+                                    <a class="text-decoration-none text-dark fw-semibold" href="/admin/orders/order/{{ order.pk }}/change/">{{ order.order_number }}</a>
+                                </td>
+                                <td class="py-3 text-muted" style="border: none;">{{ order.full_name }}</td>
+                                <td class="py-3 text-muted d-none d-md-table-cell" style="border: none;">{{ order.created_at|date:"d M Y" }}</td>
+                                <td class="py-3" style="border: none;">
+                                    <span class="badge py-1 px-2 fw-medium {% if order.status == 'cancelled' %}bg-danger text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'processing' %}bg-info text-dark{% else %}bg-dark text-white{% endif %}"
+                                          style="font-size: 0.68rem; letter-spacing: 0.04em; border-radius: 1rem;">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="py-3 pe-4 text-end fw-bold" style="border: none; font-family: var(--maira-serif); font-size: 1.05rem;">
+                                    {{ order.total|floatformat:2 }} <span style="font-size: 0.75rem; font-family: var(--maira-sans); font-weight: normal; color: #666;">MAD</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-5" style="border: none;">No orders yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+    {# Right column (Summary & Alerts) #}
+    <div class="col-lg-4">
+        
+        {# Order breakdown #}
+        <div class="mb-4 p-4" class="card-frosted">
+            <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.12em;">Orders by Status</h2>
+            <ul class="list-unstyled small mb-4">
+                {% for item in status_breakdown %}
+                    <li class="d-flex justify-content-between py-2" style="border-bottom: 1px solid rgba(212,175,55,0.08); font-size: 0.85rem;">
+                        <span class="text-muted">{{ item.label }}</span>
+                        <span class="badge bg-dark rounded-pill">{{ item.count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="d-flex justify-content-between align-items-center pt-3" style="border-top: 1px solid rgba(212,175,55,0.15);">
+                <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.68rem; letter-spacing: 0.1em;">Revenue (30d)</span>
+                <span class="fw-bold" style="font-family: var(--maira-serif); font-size: 1.2rem; color: var(--maira-dark);">{{ revenue_30d|floatformat:2 }} MAD</span>
+            </div>
+        </div>
+
+        {# Stock alerts #}
+        <div class="p-4" class="card-frosted">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <h2 class="mb-0 text-uppercase fw-bold" style="font-size: 0.78rem; letter-spacing: 0.12em;">Stock Alerts</h2>
+                <span class="badge text-danger" style="background: rgba(220,53,69,0.1); font-size: 0.65rem;">≤ {{ low_stock_threshold }}</span>
+            </div>
+            
+            {% if low_stock_products %}
+                <ul class="list-unstyled small mb-3">
+                    {% for product in low_stock_products %}
+                        <li class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid rgba(212,175,55,0.08); font-size: 0.82rem;">
+                            <a class="text-decoration-none text-dark" href="/admin/products/product/{{ product.pk }}/change/">{{ product.name }}</a>
+                            <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 0.68rem; font-weight: 500;">{{ product.quantity }} left</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="small text-muted mb-4 text-center">No low-stock products.</p>
+            {% endif %}
+            
+            {% if low_stock_variants %}
+                <h3 class="text-uppercase fw-bold mb-3 mt-4" style="font-size: 0.72rem; letter-spacing: 0.1em; color: var(--maira-accent);">Variant Alerts</h3>
+                <ul class="list-unstyled small mb-0">
+                    {% for variant in low_stock_variants %}
+                        <li class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid rgba(212,175,55,0.08); font-size: 0.82rem;">
+                            <a class="text-decoration-none text-dark" href="/admin/products/productvariant/{{ variant.pk }}/change/">{{ variant }}</a>
+                            <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 0.68rem; font-weight: 500;">{{ variant.stock }} left</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

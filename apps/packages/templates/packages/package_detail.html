@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ package.name }} — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'packages:list' %}" class="text-decoration-none text-dark">Packages</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ package.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        {% if package.display_image %}
+            <img src="{{ package.display_image.url }}" class="img-fluid rounded w-100" alt="{{ package.name }}">
+        {% else %}
+            <img src="{% static 'img/placeholder.svg' %}" class="img-fluid rounded w-100" alt="{{ package.name }}">
+        {% endif %}
+    </div>
+
+    <div class="col-lg-6">
+        <h1 class="h3 mb-2">{{ package.name }}</h1>
+        <p class="text-muted mb-3">{{ package.description|linebreaksbr }}</p>
+
+        <div class="card border-0 bg-light mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Bundle price</span>
+                    <span class="fs-4 fw-bold text-dark">{{ package.final_price|floatformat:2 }} MAD</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Value if bought separately</span>
+                    <span class="text-decoration-line-through text-muted">{{ package.original_price|floatformat:2 }} MAD</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">You save</span>
+                    <span class="fw-bold text-success">{{ package.savings|floatformat:2 }} MAD ({{ package.discount_percentage }}%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-2 mb-3">
+            <form method="post" action="{% url 'packages:add_to_cart' package.slug %}" class="w-100">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-dark w-100 py-3 text-uppercase letter-spacing-1 fw-bold btn-luxury-cart">
+                    Add Full Bundle to Cart ({{ package.final_price|floatformat:2 }} MAD)
+                </button>
+            </form>
+            <form method="post" action="{% url 'packages:add_to_wishlist' package.slug %}" class="w-100">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2 btn-luxury-wishlist">
+                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <span>Save Bundle to Wishlist</span>
+                </button>
+            </form>
+        </div>
+
+        <p class="small text-muted mb-0">Includes {{ package.products.count }} piece{{ package.products.count|pluralize }}. You can also browse and add individual items below.</p>
+    </div>
+</div>
+
+<div class="row mt-5 pt-4 border-top">
+    <div class="col-12 mb-3">
+        <h2 class="h5 fw-bold text-uppercase letter-spacing-1">What's included in this set</h2>
+    </div>
+    <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 compact-product-grid">
+        {% for product in included_products %}
+            {% include "products/includes/product_card.html" with product=product %}
+        {% empty %}
+            <div class="col-12"><p class="text-muted">This package has not been configured yet.</p></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

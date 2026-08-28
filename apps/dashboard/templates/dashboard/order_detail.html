@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order {{ order.order_number }} — Maira Bijouterie{% endblock %}
+
+{% block main_classes %}container my-4{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-4">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-dark">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}" class="text-decoration-none text-dark">My account</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'dashboard:orders' %}" class="text-decoration-none text-dark">Orders</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ order.order_number }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-4 pb-3" class="border-bottom-gold-subtle">
+    <div>
+        <p class="text-overline mb-1">Order details</p>
+        <h1 class="section-title mb-2" style="font-size: 2rem;">Order {{ order.order_number }}</h1>
+        <div class="d-flex align-items-center gap-3 text-muted small">
+            <span>{{ order.created_at|date:"d M Y H:i" }}</span>
+            <span style="color: rgba(212,175,55,0.4);">•</span>
+            <span>{{ order.get_payment_method_display }}</span>
+            <span style="color: rgba(212,175,55,0.4);">•</span>
+            <span class="badge px-3 py-1 fw-medium {% if order.status == 'cancelled' %}bg-danger text-white{% elif order.status == 'delivered' %}bg-success text-white{% elif order.status == 'processing' %}bg-info text-dark{% else %}bg-dark text-white{% endif %}"
+                  style="border-radius: 1rem; font-size: 0.65rem; letter-spacing: 0.04em;">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+    </div>
+    <a href="{{ order.whatsapp_link }}" target="_blank" rel="noopener" class="btn text-white fw-semibold px-4 py-2"
+       style="background: #25D366; border: none; border-radius: 2rem; letter-spacing: 0.05em; font-size: 0.78rem;">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-2">
+            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
+        </svg>
+        Confirm on WhatsApp
+    </a>
+</div>
+
+<div class="row g-5">
+    {# Left — order summary include #}
+    <div class="col-lg-7">
+        <div class="card-frosted">
+            {% include "orders/includes/order_summary.html" with order=order %}
+        </div>
+    </div>
+
+    {# Right — delivery details #}
+    <div class="col-lg-5">
+        <div class="mb-4 p-4" class="card-frosted">
+            <h2 class="text-uppercase fw-bold mb-4" style="font-size: 0.78rem; letter-spacing: 0.14em;">Delivery Details</h2>
+            <p class="mb-1 text-dark" style="font-size: 0.95rem; font-weight: 500;">{{ order.full_name }}</p>
+            <p class="small text-muted mb-1">{{ order.address }}</p>
+            <p class="small text-muted mb-3">{{ order.city }}{% if order.postal_code %} {{ order.postal_code }}{% endif %}</p>
+            <p class="small fw-semibold text-dark mb-0 d-flex align-items-center gap-2">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                {{ order.phone }}
+            </p>
+        </div>
+
+        {% if order.notes %}
+            <div class="mb-4 p-4" class="card-frosted">
+                <h2 class="text-uppercase fw-bold mb-3" style="font-size: 0.78rem; letter-spacing: 0.14em;">Order Notes</h2>
+                <p class="small text-muted mb-0" style="line-height: 1.6;">{{ order.notes }}</p>
+            </div>
+        {% endif %}
+
+        {% if order.payment_method == 'bank_transfer' %}
+            <div class="p-4" style="background: rgba(212,175,55,0.06); border-radius: 1.25rem; border: 1.5px solid rgba(212,175,55,0.3);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <svg width="18" height="18" fill="none" stroke="var(--maira-gold)" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4"/></svg>
+                    <h2 class="mb-0 fw-bold text-uppercase" style="font-size: 0.78rem; letter-spacing: 0.1em;">Bank Transfer Order</h2>
+                </div>
+                <p class="small text-muted mb-0">Payment reference: <strong class="text-dark">{{ order.order_number }}</strong></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
