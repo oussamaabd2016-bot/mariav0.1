@@ -107,15 +107,37 @@ mariav0.1/
 
 ---
 
-## Running in production
+## Live Online Deployment (Instant Public HTTPS URL)
+
+You can launch your full store live on the internet with a public HTTPS URL (using Cloudflare Tunnel, 100% free with zero configuration):
+
+### On Linux / WSL:
+```bash
+# Start Gunicorn server + Cloudflare Tunnel in one command
+./run_live.sh
+```
+
+### On Windows:
+1. Install Cloudflare CLI (one-time setup in PowerShell):
+   ```powershell
+   winget install Cloudflare.cloudflared
+   ```
+2. Run the launcher:
+   ```cmd
+   run_live.bat
+   ```
+
+Cloudflare will output a public HTTPS link in your terminal (e.g. `https://your-site.trycloudflare.com`) that you can open on any phone or share with anyone worldwide.
+
+---
+
+## Running in production (Custom Domain / VPS)
 
 1. Set `DEBUG=False` and a strong `SECRET_KEY` in your `.env`
 2. Set `DATABASE_URL` to your PostgreSQL connection string
 3. Set `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` to your domain
 4. Run `python manage.py collectstatic`
-5. Serve with Gunicorn behind Nginx or any reverse proxy
+5. Serve with Gunicorn behind Nginx, Caddy, or Cloudflare Tunnel
 
 The `prod.py` settings file already has HTTPS enforcement, HSTS, secure cookies, MIME-sniff protection and referrer policy configured. You just need to point it at a real domain with a valid SSL certificate.
-
----
 
