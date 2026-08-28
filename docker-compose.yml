@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    container_name: maira_web
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./media:/app/media
+      - ./staticfiles:/app/staticfiles
+      - ./db.sqlite3:/app/db.sqlite3
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.prod
+      - DEBUG=False
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=https://*
