@@ -94,7 +94,7 @@ mariav0.1/
    ```powershell
    winget install Cloudflare.cloudflared
    ```
-   .....or its automaticly install after this command if u dont have it .
+   .....or its automaticly install after this command with requirements.txt
 2. Run the launcher:
    ```cmd
    run_live.bat
