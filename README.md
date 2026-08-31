@@ -1,6 +1,6 @@
 # Maira Bijouterie
 
-An e-commerce store for Maira Bijouterie, a Moroccan jewellery brand selling gold-plated, stainless steel and fashion jewellery online. Built as a full Django storefront to replace WhatsApp and Instagram DM-based sales with a proper catalogue, cart and checkout flow.
+An e-commerce store for e.g Maira Bijouterie, a Moroccan jewellery brand selling gold-plated, stainless steel and fashion jewellery online. Built as a full Django .
 
 ---
 
@@ -11,7 +11,7 @@ An e-commerce store for Maira Bijouterie, a Moroccan jewellery brand selling gol
 - **Cart & Wishlist** — session-based cart with quantity controls, coupon codes, and a saved wishlist for registered users
 - **Checkout** — Cash on Delivery and Bank Transfer at launch, with WhatsApp confirmation flow
 - **Customer accounts** — email-based registration, order history, profile management
-- **Reviews** — star ratings and text reviews per product, with admin approval
+- **Reviews** — star ratings and text reviews per product .
 - **Admin panel** — custom sidebar layout with quick actions and full model management
 - **Staff dashboard** — order overview, best sellers, low-stock alerts, revenue stats
 
@@ -37,25 +37,18 @@ An e-commerce store for Maira Bijouterie, a Moroccan jewellery brand selling gol
 **Requirements:** Python 3.12+
 
 ```bash
-# 1. Clone and enter the project
-git clone <your-repo-url>
-cd mariav0.1
 
-# 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-
-# 3. Install dependencies
+# 1. Install dependencies
 pip install -r requirements.txt
 
 
-# 5. Run migrations
+# 2. Run migrations
 python manage.py migrate
 
-# 6. Create an admin user
+# 3. Create an admin user
 python manage.py createsuperuser
 
-# 7. Start the development server
+# 4. Start the development server
 python manage.py runserver
 ```
 
@@ -63,18 +56,6 @@ Visit `http://127.0.0.1:8000` for the storefront and `http://127.0.0.1:8000/admi
 
 ---
 
-## Environment variables
-
-See [`.env.example`](.env.example) for the full list. The important ones:
-
-| Variable | Required | Description |
-|---|---|---|
-| `SECRET_KEY` | Yes | Django secret key — use a long random string in production |
-| `DEBUG` | Yes | `True` for local dev, `False` in production |
-| `ALLOWED_HOSTS` | Yes | Comma-separated list of your domain(s) |
-| `DATABASE_URL` | Yes | `sqlite:///db.sqlite3` locally, Postgres URL in production |
-| `CSRF_TRUSTED_ORIGINS` | Prod | Your `https://` origin(s) |
-| `WHATSAPP_NUMBER` | No | Phone number for WhatsApp order confirmation links |
 
 ---
 
@@ -84,20 +65,20 @@ See [`.env.example`](.env.example) for the full list. The important ones:
 mariav0.1/
 ├── apps/
 │   ├── accounts/       # Custom user model, login, register, profile
-│   ├── cart/           # Session cart + coupon codes
-│   ├── dashboard/      # Customer order history + staff analytics
-│   ├── home/           # Homepage, about, contact, sitemap
+│   ├── cart/           # Session cart + coupon 
+│   ├── dashboard/      # Customer order history + staff/admin analytic
+│   ├── home/           # Homepage, about, contact, sitemap ...
 │   ├── orders/         # Checkout, order creation, confirmation
-│   ├── packages/       # Curated jewellery bundles
+│   ├── packages/       # Curated jewellery bundles (used plain picture for ex)
 │   ├── payments/       # Payment stub (COD + bank transfer)
 │   ├── products/       # Catalogue, categories, filters
 │   ├── reviews/        # Star ratings and text reviews
 │   └── wishlist/       # Saved products per user
 ├── config/
 │   └── settings/
-│       ├── base.py     # Shared settings
-│       ├── dev.py      # Local development overrides
-│       └── prod.py     # Production overrides
+│       ├── base.py     
+│       ├── dev.py       
+│       └── prod.py     
 ├── static/
 │   ├── css/base.css    # Main stylesheet
 │   └── js/             # Cart, filters, homepage carousel, etc.
@@ -107,28 +88,17 @@ mariav0.1/
 
 ---
 
-## Live Online Deployment (Instant Public HTTPS URL)
-
-You can launch your full store live on the internet with a public HTTPS URL (using Cloudflare Tunnel, 100% free with zero configuration):
-
-### On Linux / WSL:
-```bash
-# Start Gunicorn server + Cloudflare Tunnel in one command
-./run_live.sh
-```
 
 ### On Windows:
 1. Install Cloudflare CLI (one-time setup in PowerShell):
    ```powershell
    winget install Cloudflare.cloudflared
    ```
+   .....or its automaticly install after this command if u dont have it .
 2. Run the launcher:
    ```cmd
    run_live.bat
    ```
-
-Cloudflare will output a public HTTPS link in your terminal (e.g. `https://your-site.trycloudflare.com`) that you can open on any phone or share with anyone worldwide.
-
 ---
 
 ## Running in production (Custom Domain / VPS)
